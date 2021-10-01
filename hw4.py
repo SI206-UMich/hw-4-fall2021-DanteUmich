@@ -15,14 +15,14 @@ class Customer:
 
     # The customer orders the food and there could be different cases   
     def validate_order(self, cashier, stall, item_name, quantity):
-        if not(cashier.has_stall(stall)):
+        if not(Cashier.has_stall(stall)):
             print("Sorry, we don't have that vendor stall. Please try a different one.")
-        elif not(stall.has_item(item_name, quantity)):  
+        elif not(Stall.has_item(item_name, quantity)):  
             print("Our stall has run out of " + item_name + " :( Please try a different stall!")
-        elif self.wallet < stall.compute_cost(quantity): 
+        elif self.wallet < Stall.compute_cost(quantity): 
             print("Don't have enough money for that :( Please reload more money!")
         else:
-            bill = cashier.place_order(stall, item_name, quantity) 
+            bill = Cashier.place_order(stall, item_name, quantity) 
             self.submit_order(cashier, stall, bill) 
     
     # Submit_order takes a cashier, a stall and an amount as parameters, 
@@ -62,8 +62,8 @@ class Cashier:
 	# The stall processes the order
 	# Function returns cost of the order, using compute_cost method
     def place_order(self, stall, item, quantity):
-        stall.process_order(item, quantity)
-        return stall.compute_cost(quantity) 
+        Stall.process_order(item, quantity)
+        return Stall.compute_cost(quantity) 
     
     # string function.
     def __str__(self):
@@ -169,8 +169,8 @@ class TestAllMethods(unittest.TestCase):
     def test_compute_cost(self):
         #what's wrong with the following statements?
         #can you correct them?
-        self.assertEqual(self.s1.compute_cost(self.s1,5), 51)
-        self.assertEqual(self.s3.compute_cost(self.s3,6), 45)
+        self.assertEqual(self.s1.compute_cost(self.s1,5), 50) #was 51
+        self.assertEqual(self.s3.compute_cost(self.s3,6), 42) #was 45
 
 	# Check that the stall can properly see when it is empty
     def test_has_item(self):
@@ -179,24 +179,25 @@ class TestAllMethods(unittest.TestCase):
         # Test to see if has_item returns True when a stall has enough items left
         # Please follow the instructions below to create three different kinds of test cases 
         # Test case 1: the stall does not have this food item: 
-        
+        self.assertFalse(self.s1.has_item("Water",2))
         # Test case 2: the stall does not have enough food item: 
-        
+        self.assertFalse(self.s1.has_item("Taco",55))
         # Test case 3: the stall has the food item of the certain quantity: 
-        pass
+        self.assertTrue(self.s1.has_item("Burger",1))
 
 	# Test validate order
     def test_validate_order(self):
 		# case 1: test if a customer doesn't have enough money in their wallet to order
-
+        self.f2.validate_order(self.c1,self.s2,"Taco",18)
 		# case 2: test if the stall doesn't have enough food left in stock
-
+        self.f2.validate_order(self.c1,self.s2,"Taco",60)
 		# case 3: check if the cashier can order item from that stall
-        pass
+        self.f2.validate_order(self.c1,self.s2,"Taco",1)
 
     # Test if a customer can add money to their wallet
     def test_reload_money(self):
-        pass
+        self.f2.reload_money(5)
+        self.assertEqual(self.f2.wallet,155)
     
 ### Write main function
 def main():
