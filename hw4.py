@@ -201,21 +201,37 @@ class TestAllMethods(unittest.TestCase):
 ### Write main function
 def main():
     #Create different objects 
-    Cust1=Customer(Bob, 14)
-    Cust2=Customer(Trevor, 120)
-    Cust3=Customer(Cinderella, 10000)
+    inventory1={"tilapia":5,"ribs":2,"fries":10}
+    inventory2={"muffin":3,"cake":1,"brownie":12}
+
+    cust1=Customer("Bob", 14)
+    cust2=Customer("Trevor", 24)
+    cust3=Customer("Cinderella", 100)
+
+    stall1=Stall("bigeats", inventory1, 10)
+    stall2=Stall("finewine", inventory2, 5)
+
+    cash1=Cashier("Sarah", {stall1.name})
+    cash2=Cashier("Brad", {stall2.name})
 
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
     #case 1: the cashier does not have the stall 
-    
-    #case 2: the casher has the stall, but not enough ordered food or the ordered food item
-    
+    cust1.validate_order(cash1, "finewine", "muffin", 1)
+    cust2.validate_order(cash2, "bigeats", "fries", 2)
+    cust3.validate_order(cash1, "finewine", "brownie", 1)
+    #case 2: the casher has the stall, but not enough ordered food of the ordered food item
+    cust1.validate_order(cash2, "finewine", "muffin", 4)
+    cust2.validate_order(cash1, "bigeats", "fries", 11)
+    cust3.validate_order(cash2, "finewine", "brownie", 13)
     #case 3: the customer does not have enough money to pay for the order: 
-    
+    cust1.validate_order(cash2, "finewine", "brownie", 3)
+    cust2.validate_order(cash1, "bigeats", "fries", 3)
+    cust3.validate_order(cash1, "bigeats", "brownie", 11)
     #case 4: the customer successfully places an order
-
-    pass
+    cust1.validate_order(cash2, "finewine", "cake", 1)
+    cust2.validate_order(cash1, "bigeats", "fries", 2)
+    cust3.validate_order(cash1, "bigeats", "tilapia", 2)
 
 if __name__ == "__main__":
 	main()
