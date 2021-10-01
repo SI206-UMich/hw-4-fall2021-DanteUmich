@@ -80,8 +80,22 @@ class Stall:
     def process_order(self, name, quantity):
         if self.inventory[name]>=quantity:
             self.inventory[name]-=quantity
-
-
+    def has_item(self, name, quantity):
+        if self.inventory[name]>=quantity:
+            return True
+        else:
+            return False
+    def stock_up(self, name, quantity):
+        if self.inventory.has_key(name):
+            self.inventory[name]+=quantity
+        else:
+            self.inventory[str(name)]=int(quantity)
+    def compute_cost(self,quantity):
+        total=quantity*self.cost
+        return total
+    def __str__(self):
+        Klist=self.inventory.keys()
+        return "Hello, we are "+str(self.name)+". This is the current menu "+Klist+". We charge $"+str(self.cost)+" per item. We have $"+str(self.earnings)+" in total."
 
 class TestAllMethods(unittest.TestCase):
     
@@ -187,6 +201,9 @@ class TestAllMethods(unittest.TestCase):
 ### Write main function
 def main():
     #Create different objects 
+    Cust1=Customer(Bob, 14)
+    Cust2=Customer(Trevor, 120)
+    Cust3=Customer(Cinderella, 10000)
 
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
