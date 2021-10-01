@@ -15,14 +15,14 @@ class Customer:
 
     # The customer orders the food and there could be different cases   
     def validate_order(self, cashier, stall, item_name, quantity):
-        if not(Cashier.has_stall(stall)):
+        if not(cashier.has_stall(stall)): 
             print("Sorry, we don't have that vendor stall. Please try a different one.")
-        elif not(Stall.has_item(item_name, quantity)):  
-            print("Our stall has run out of " + item_name + " :( Please try a different stall!")
-        elif self.wallet < Stall.compute_cost(quantity): 
+        elif not(stall.has_item(item_name, quantity)):  
+            print("Our stall has run out of " + str(item_name) + " :( Please try a different stall!")
+        elif self.wallet < stall.compute_cost(quantity): 
             print("Don't have enough money for that :( Please reload more money!")
         else:
-            bill = Cashier.place_order(stall, item_name, quantity) 
+            bill = cashier.place_order(stall, item_name, quantity) 
             self.submit_order(cashier, stall, bill) 
     
     # Submit_order takes a cashier, a stall and an amount as parameters, 
@@ -43,11 +43,14 @@ class Cashier:
     # Constructor
     def __init__(self, name, directory =[]):
         self.name = name
-        self.directory = directory[:] # make a copy of the directory
+        self.directory = directory # make a copy of the directory USED TO BE 'directory[:]'
 
     # Whether the stall is in the cashier's directory
     def has_stall(self, stall):
-        return stall in self.directory
+        if stall in self.directory:
+            return True
+        else:
+            return False
 
     # Adds a stall to the directory of the cashier.
     def add_stall(self, new_stall):
@@ -62,8 +65,8 @@ class Cashier:
 	# The stall processes the order
 	# Function returns cost of the order, using compute_cost method
     def place_order(self, stall, item, quantity):
-        Stall.process_order(item, quantity)
-        return Stall.compute_cost(quantity) 
+        stall.process_order(item, quantity)
+        return stall.compute_cost(quantity) 
     
     # string function.
     def __str__(self):
@@ -74,19 +77,22 @@ class Cashier:
 class Stall:
     def __init__(self, name, inventory, cost=7, earnings=0):
         self.name=name
-        self.invnetory=inventory
+        self.inventory=inventory
         self.earnings=earnings
         self.cost=cost
     def process_order(self, name, quantity):
         if self.inventory[name]>=quantity:
             self.inventory[name]-=quantity
     def has_item(self, name, quantity):
-        if self.inventory[name]>=quantity:
-            return True
+        if name in self.inventory:
+            if self.inventory[name]>=quantity:
+                return True
+            else:
+                return False
         else:
             return False
     def stock_up(self, name, quantity):
-        if self.inventory.has_key(name):
+        if name in self.inventory:
             self.inventory[name]+=quantity
         else:
             self.inventory[str(name)]=int(quantity)
@@ -124,7 +130,7 @@ class TestAllMethods(unittest.TestCase):
     def test_cashier_constructor(self):
         self.assertEqual(self.c1.name, "West")
         #cashier holds the directory - within the directory there are three stalls
-        self.assertEqual(len(self.c1.directory), 3) 
+        self.assertEqual(len(self.c1.directory), 3)
 
 	## Check to see whether constructors work
     def test_truck_constructor(self):
@@ -169,8 +175,8 @@ class TestAllMethods(unittest.TestCase):
     def test_compute_cost(self):
         #what's wrong with the following statements?
         #can you correct them?
-        self.assertEqual(self.s1.compute_cost(self.s1,5), 50) #was 51
-        self.assertEqual(self.s3.compute_cost(self.s3,6), 42) #was 45
+        self.assertEqual(self.s1.compute_cost(5), 50) #was 51
+        self.assertEqual(self.s3.compute_cost(6), 42) #was 45
 
 	# Check that the stall can properly see when it is empty
     def test_has_item(self):
@@ -218,21 +224,21 @@ def main():
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
     #case 1: the cashier does not have the stall 
-    cust1.validate_order(cash1, "finewine", "muffin", 1)
-    cust2.validate_order(cash2, "bigeats", "fries", 2)
-    cust3.validate_order(cash1, "finewine", "brownie", 1)
+    cust1.validate_order(cash1, stall2, "muffin", 1)
+    cust2.validate_order(cash2, stall1, "fries", 2)
+    cust3.validate_order(cash1, stall2, "brownie", 1)
     #case 2: the casher has the stall, but not enough ordered food of the ordered food item
-    cust1.validate_order(cash2, "finewine", "muffin", 4)
-    cust2.validate_order(cash1, "bigeats", "fries", 11)
-    cust3.validate_order(cash2, "finewine", "brownie", 13)
+    cust1.validate_order(cash2, stall2, "muffin", 4)
+    cust2.validate_order(cash1, stall1, "fries", 11)
+    cust3.validate_order(cash2, stall2, "brownie", 13)
     #case 3: the customer does not have enough money to pay for the order: 
-    cust1.validate_order(cash2, "finewine", "brownie", 3)
-    cust2.validate_order(cash1, "bigeats", "fries", 3)
-    cust3.validate_order(cash1, "bigeats", "brownie", 11)
+    cust1.validate_order(cash2, stall2, "brownie", 3)
+    cust2.validate_order(cash1, stall1, "fries", 3)
+    cust3.validate_order(cash1, stall1, "brownie", 11)
     #case 4: the customer successfully places an order
-    cust1.validate_order(cash2, "finewine", "cake", 1)
-    cust2.validate_order(cash1, "bigeats", "fries", 2)
-    cust3.validate_order(cash1, "bigeats", "tilapia", 2)
+    cust1.validate_order(cash2, stall2, "cake", 1)
+    cust2.validate_order(cash1, stall1, "fries", 2)
+    cust3.validate_order(cash1, stall1, "tilapia", 2)
 
 if __name__ == "__main__":
 	main()
